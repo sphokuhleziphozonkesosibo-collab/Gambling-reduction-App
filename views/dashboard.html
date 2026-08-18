@@ -1,0 +1,790 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-translate="dashboardTitle">Dashboard - BetAware SA</title>
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2 data-translate="appName">🎯 BetAware SA</h2>
+            </div>
+            <div class="nav-links">
+                <span id="userWelcome" data-translate="welcome">Welcome!</span>
+                <!-- Language Switcher -->
+                <select id="languageSwitch" onchange="switchLanguage(this.value)" style="margin-right: 15px; padding: 5px; border-radius: 5px; border: 1px solid #ddd;">
+                    <option value="en">English</option>
+                    <option value="zu">IsiZulu</option>
+                    <option value="xh">IsiXhosa</option>
+                    <option value="af">Afrikaans</option>
+                    <option value="nso">Sesotho sa Leboa</option>
+                    <option value="st">Sesotho</option>
+                    <option value="tn">Setswana</option>
+                    <option value="ts">Xitsonga</option>
+                    <option value="ss">SiSwati</option>
+                    <option value="ve">Tshivenda</option>
+                    <option value="nr">isiNdebele</option>
+                </select>
+                <button class="logout-btn" onclick="logout()" data-translate="logout">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <div class="container">
+            <!-- Welcome Section -->
+            <section class="welcome-section">
+                <h1 data-translate="welcomeBack">Welcome back, <span id="userName">User</span>! 👋</h1>
+                <p data-translate="controlBudget">Stay in control of your betting budget</p>
+            </section>
+
+            <!-- Budget Alert -->
+            <div class="alert-section" id="alertSection" style="display: none;">
+                <div class="alert alert-danger" id="alertMessage"></div>
+            </div>
+
+            <!-- Key Stats -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info">
+                        <h3 id="currentBalance">R 0</h3>
+                        <p data-translate="availableBalance">Available Balance</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-info">
+                        <h3 id="monthlyBudget">R 0</h3>
+                        <p data-translate="monthlyBudget">Monthly Budget</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-info">
+                        <h3 id="totalSpent">R 0</h3>
+                        <p data-translate="totalSpent">Total Spent</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-info">
+                        <h3 id="daysLeft">30</h3>
+                        <p data-translate="daysLeft">Days Left This Month</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Progress Bar -->
+            <section class="progress-section">
+                <div class="progress-header">
+                    <span data-translate="monthlyBudgetProgress">Monthly Budget Progress</span>
+                    <span id="progressPercentage">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="progressText">You have R 0 left for this month</span>
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <h3 data-translate="quickActions">Quick Actions</h3>
+                <div class="action-buttons">
+                    <button class="action-btn primary" onclick="quickAddExpense(50)">
+                        + R50
+                    </button>
+                    <button class="action-btn primary" onclick="quickAddExpense(100)">
+                        + R100
+                    </button>
+                    <button class="action-btn primary" onclick="quickAddExpense(200)">
+                        + R200
+                    </button>
+                    <button class="action-btn secondary" onclick="showCustomAmount()" data-translate="customAmount">
+                        Custom Amount
+                    </button>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="recent-activity">
+                <h3 data-translate="recentActivity">Recent Activity</h3>
+                <div class="activity-list" id="recentActivity">
+                    <div class="empty-state">
+                        <p data-translate="noSpending">No spending recorded yet</p>
+                        <button onclick="showCustomAmount()" data-translate="addFirstExpense">Add Your First Expense</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Custom Amount Modal -->
+    <div class="modal" id="customAmountModal" style="display: none;">
+        <div class="modal-content">
+            <h3 data-translate="addCustomExpense">Add Custom Expense</h3>
+            <form id="customExpenseForm">
+                <label for="customAmount" data-translate="amount">Amount (R):</label>
+                <input type="number" id="customAmount" min="1" required>
+                
+                <label for="bettingSite" data-translate="bettingSite">Betting Site:</label>
+                <select id="bettingSite" required>
+                    <option value="" data-translate="selectSite">Select site</option>
+                    <option value="Hollywood Bets">Hollywood Bets</option>
+                    <option value="Betway">Betway</option>
+                    <option value="Sportingbet">Sportingbet</option>
+                    <option value="Lotto">Lotto</option>
+                    <option value="Other" data-translate="other">Other</option>
+                </select>
+                
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="hideCustomAmount()" data-translate="cancel">Cancel</button>
+                    <button type="submit" class="btn-confirm" data-translate="addExpense">Add Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // SIMPLE DASHBOARD WITH 11 LANGUAGES
+        let currentUser = null;
+        let currentLanguage = 'en';
+
+        // 11 Official SA Languages Translations
+        const translations = {
+            en: {
+                dashboardTitle: "Dashboard - BetAware SA",
+                appName: "🎯 BetAware SA",
+                welcome: "Welcome!",
+                welcomeBack: "Welcome back",
+                controlBudget: "Stay in control of your betting budget",
+                availableBalance: "Available Balance",
+                monthlyBudget: "Monthly Budget",
+                totalSpent: "Total Spent",
+                daysLeft: "Days Left This Month",
+                monthlyBudgetProgress: "Monthly Budget Progress",
+                quickActions: "Quick Actions",
+                customAmount: "Custom Amount",
+                recentActivity: "Recent Activity",
+                noSpending: "No spending recorded yet",
+                addFirstExpense: "Add Your First Expense",
+                addCustomExpense: "Add Custom Expense",
+                amount: "Amount (R):",
+                bettingSite: "Betting Site:",
+                selectSite: "Select site",
+                other: "Other",
+                cancel: "Cancel",
+                addExpense: "Add Expense",
+                logout: "Logout"
+            },
+            zu: {
+                dashboardTitle: "Ideshibhodi - BetAware SA",
+                appName: "🎯 BetAware SA",
+                welcome: "Siyakwamukela!",
+                welcomeBack: "Wamukeleka futhi",
+                controlBudget: "Hlala ulawula isabelo sakho sokubheja",
+                availableBalance: "Ibalansi etholakalayo",
+                monthlyBudget: "Isabelo sanyanga",
+                totalSpent: "Inani elichithiwe",
+                daysLeft: "Izinsali zosuku zale nyanga",
+                monthlyBudgetProgress: "Intuthuko yesabelo sanyanga",
+                quickActions: "Izenzo ezisheshayo",
+                customAmount: "Inani elikhethekile",
+                recentActivity: "Umsebenzi wakamuva",
+                noSpending: "Azikho izindleko ezirekhodiwe okwamanje",
+                addFirstExpense: "Faka isindleko sakho sokuqala",
+                addCustomExpense: "Faka isindleko ekhethekile",
+                amount: "Inani (R):",
+                bettingSite: "Indawo yokubheja:",
+                selectSite: "Khetha indawo",
+                other: "Okunye",
+                cancel: "Khansela",
+                addExpense: "Faka isindleko",
+                logout: "Phuma"
+            },
+            xh: {
+                dashboardTitle: "Dashboard - BetAware SA",
+                appName: "🎯 BetAware SA",
+                welcome: "Wamkelekile!",
+                welcomeBack: "Wamkelekile kwakhona",
+                controlBudget: "Hlala uyalawula uxwebhu lwakho lwemali yokubheja",
+                availableBalance: "Ibhalansi ekhoyo",
+                monthlyBudget: "Uxwebhu lwemali lwenyanga",
+                totalSpent: "Iyonke edliwe",
+                daysLeft: "Iintsuku eziseleyo kule nyanga",
+                monthlyBudgetProgress: "Inkqubela yoxwebhu lwemali lwenyanga",
+                quickActions: "Izenzo ezikhawulezileyo",
+                customAmount: "Imali eqhelekileyo",
+                recentActivity: "Umsebenzi wakutshanje",
+                noSpending: "Akukho machitho achongiweyo okwangoku",
+                addFirstExpense: "Yongeza umchitho wakho wokuqala",
+                addCustomExpense: "Yongeza umchitho oqhelekileyo",
+                amount: "Imali (R):",
+                bettingSite: "Indawo yokubheja:",
+                selectSite: "Khetha indawo",
+                other: "Okunye",
+                cancel: "Rhoxisa",
+                addExpense: "Yongeza umchitho",
+                logout: "Phuma"
+            },
+            af: {
+                dashboardTitle: "Dashboard - BetAware SA",
+                appName: "🎯 BetAware SA",
+                welcome: "Welkom!",
+                welcomeBack: "Welkom terug",
+                controlBudget: "Bly in beheer van jou dobbelbegroting",
+                availableBalance: "Beskikbare Balans",
+                monthlyBudget: "Maandelikse Begroting",
+                totalSpent: "Totaal Bestee",
+                daysLeft: "Dae oor hierdie maand",
+                monthlyBudgetProgress: "Maandelikse Begrotingsvordering",
+                quickActions: "Vinnige Aksies",
+                customAmount: "Pasgemaakte Bedrag",
+                recentActivity: "Onlangse Aktiwiteit",
+                noSpending: "Nog geen besteding aangeteken nie",
+                addFirstExpense: "Voeg jou eerste uitgawe by",
+                addCustomExpense: "Voeg Pasgemaakte Uitgawe by",
+                amount: "Bedrag (R):",
+                bettingSite: "Weddenskap Webwerf:",
+                selectSite: "Kies webwerf",
+                other: "Ander",
+                cancel: "Kanselleer",
+                addExpense: "Voeg Uitgawe by",
+                logout: "Teken uit"
+            },
+            nso: {
+                dashboardTitle: "Dashboard - BetAware SA",
+                appName: "🎯 BetAware SA",
+                welcome: "Amogela!",
+                welcomeBack: "Amogela gape",
+                controlBudget: "Dula o laola peeletšo ya gago ya go matha mabakgakala",
+                availableBalance: "Peeletšo e hwetšagalago",
+                monthlyBudget: "Peeletšo ya Kgwedi",
+                totalSpent: "Kakaretšo e Šomišitšwego",
+                daysLeft: "Matšatši a Šetšego Kgweding Ye",
+                monthlyBudgetProgress: "Tšwelopele ya Peeletšo ya Kgwedi",
+                quickActions: "Ditiro tša Phanya",
+                customAmount: "Tekanyo e Ikgethilego",
+                recentActivity: "Tiroidišo ya Bjako",
+                noSpending: "Ga go ditefogo tša tšhelete go fihla bjale",
+                addFirstExpense: "Lokela ditefogo tša gago tša mathomo",
+                addCustomExpense: "Lokela Ditefogo tše di Ikgethilego",
+                amount: "Tekanyo (R):",
+                bettingSite: "Sebaka sa Go Matha Mabakgakala:",
+                selectSite: "Kgetha sebaka",
+                other: "Tše dingwe",
+                cancel: "Khansela",
+                addExpense: "Lokela Ditefogo",
+                logout: "Tšwa"
+            },
+            st: {
+                dashboardTitle: "Dashboard - BetAware SA",
+                appName: "🎯 BetAware SA",
+                welcome: "O amohetse!",
+                welcomeBack: "O amohetse hape",
+                controlBudget: "Dula o laola tekanyetso ea hau ea ho bapala marabaraba",
+                availableBalance: "Tekanyetso e fumanehang",
+                monthlyBudget: "Tekanyetso ea Khoeli",
+                totalSpent: "Kakaretso e Sebedisitseng",
+                daysLeft: "Matsatsi a Setseng Khoeling Ena",
+                monthlyBudgetProgress: "Tsoelo-pele ea Tekanyetso ea Khoeli",
+                quickActions: "Lits'ebetso tsa Potlako",
+                customAmount: "Chelete e Ithopileng",
+                recentActivity: "Mosebetsi oa Haufinyane",
+                noSpending: "Ha ho chelete e ngolisitseng ho fihlela joale",
+                addFirstExpense: "Kenya tekanyetso ea hau ea pele",
+                addCustomExpense: "Kenya Tekanyetso e Ithopileng",
+                amount: "Chelete (R):",
+                bettingSite: "Sebaka sa Ho Bapala Marabaraba:",
+                selectSite: "Khetha sebaka",
+                other: "Tse ding",
+                cancel: "Hlakola",
+                addExpense: "Kenya Tekanyetso",
+                logout: "Tsoa"
+            },
+            tn: {
+                dashboardTitle: "Dashboard - BetAware SA",
+                appName: "🎯 BetAware SA",
+                welcome: "O amogetse!",
+                welcomeBack: "O amogetse gape",
+                controlBudget: "Nna o laola patlakego ya gago ya go tshela mabakgakala",
+                availableBalance: "Patlakego e e gona",
+                monthlyBudget: "Patlakego ya Ngwedi",
+                totalSpent: "Kakaretso e e dirisitsweng",
+                daysLeft: "Matsatsi a a Setseng mo Ngweding Eno",
+                monthlyBudgetProgress: "Tlhabololo ya Patlakego ya Ngwedi",
+                quickActions: "Ditiro tsa Phakela",
+                customAmount: "Madi a a Itekanngwang",
+                recentActivity: "Tiro ya Bosheng",
+                noSpending: "Ga go madi a a kwadilweng go fitlha ga bjale",
+                addFirstExpense: "Tsenya ditshenyegelo tsa gago tsa ntlha",
+                addCustomExpense: "Tsenya Ditshenyegelo tse di Itekanngwang",
+                amount: "Madi (R):",
+                bettingSite: "Lefelo la Go Tshela Mabakgakala:",
+                selectSite: "Kgetha lefelo",
+                other: "Tse dingwe",
+                cancel: "Hlakola",
+                addExpense: "Tsenya Ditshenyegelo",
+                logout: "Tswa"
+            },
+            ts: {
+                dashboardTitle: "Dashboard - BetAware SA",
+                appName: "🎯 BetAware SA",
+                welcome: "Amukela!",
+                welcomeBack: "Amukela nakambe",
+                controlBudget: "Tshama u lawula bajeti ya wena ya ku tlhela mabangi",
+                availableBalance: "Bajeti leyi nga kona",
+                monthlyBudget: "Bajeti ya N'weti",
+                totalSpent: "Xigamba lexi tirisiweke",
+                daysLeft: "Siku leswi saleke eka N'weti Lowu",
+                monthlyBudgetProgress: "Nhluvukiso wa Bajeti ya N'weti",
+                quickActions: "Mirimo ya Xiphanya",
+                customAmount: "Mali ya Xihlawulekisi",
+                recentActivity: "Ntirho wa Sweswi",
+                noSpending: "A ku na mali leyi tsariweke ku fikela sweswi",
+                addFirstExpense: "Ngeleta ndzimalo wa wena wa sungula",
+                addCustomExpense: "Ngeleta Ndzhimalo wa Xihlawulekisi",
+                amount: "Mali (R):",
+                bettingSite: "Xikandza xa Ku Tlhela Mabangi:",
+                selectSite: "Hlola xikandza",
+                other: "Swin'wana",
+                cancel: "Hansi",
+                addExpense: "Ngeleta Ndzhimalo",
+                logout: "Humela"
+            },
+            ss: {
+                dashboardTitle: "Dashboard - BetAware SA",
+                appName: "🎯 BetAware SA",
+                welcome: "Wemukelekile!",
+                welcomeBack: "Wemukelekile futsi",
+                controlBudget: "Hlala ulawula inzuzo yakho yekudlala imijovo",
+                availableBalance: "Inzuzo lekhona",
+                monthlyBudget: "Inzuzo Yenyanga",
+                totalSpent: "Inani lelisetjentisiwe",
+                daysLeft: "Emalanga asele enyangeni Lena",
+                monthlyBudgetProgress: "Intfutfuko yenhloso yenhlalakahle yenyanga",
+                quickActions: "Tintfo letisheshayo",
+                customAmount: "Inani lelikhethekile",
+                recentActivity: "Umsebenti wesimanje",
+                noSpending: "Ayikho imali lebhaliwe kuze kube manje",
+                addFirstExpense: "Ngenisa incenyeti yakho yekucala",
+                addCustomExpense: "Ngenisa Incenyeti lelikhethekile",
+                amount: "Inani (R):",
+                bettingSite: "Indzawo yekudlala imijovo:",
+                selectSite: "Khetsa indzawo",
+                other: "Lokunye",
+                cancel: "Khansela",
+                addExpense: "Ngenisa Incenyeti",
+                logout: "Phuma"
+            },
+            ve: {
+                dashboardTitle: "Dashboard - BetAware SA",
+                appName: "🎯 BetAware SA",
+                welcome: "Takalitsheni!",
+                welcomeBack: "Takalitsheni nga u vhuyaho",
+                controlBudget: "Dzula u laula bujeti ya u wana ya u bheja",
+                availableBalance: "Bujeti yo wanala",
+                monthlyBudget: "Bujeti ya Mvedzi",
+                totalSpent: "Thanga yo shumiswa",
+                daysLeft: "Maha o salela kha Mvedzi Uno",
+                monthlyBudgetProgress: "Mvelaphanga ha Bujeti ya Mvedzi",
+                quickActions: "Mishumo ya Tshifhinga Tshidifi",
+                customAmount: "Tshelede ya u ita",
+                recentActivity: "Mushumo wa Vhukati",
+                noSpending: "A hu na tshelede yo ngelwaho hu tshi fhira zwino",
+                addFirstExpense: "Dzhenisa tshifhinga tshawe tsha u thoma",
+                addCustomExpense: "Dzhenisa Tshifhinga tsha U Ita",
+                amount: "Tshelede (R):",
+                bettingSite: "Fhethu ha U Bheja:",
+                selectSite: "Nanga fhethu",
+                other: "Zwinwe",
+                cancel: "Khanela",
+                addExpense: "Dzhenisa Tshifhinga",
+                logout: "Bva"
+            },
+            nr: {
+                dashboardTitle: "Dashboard - BetAware SA",
+                appName: "🎯 BetAware SA",
+                welcome: "Wamukelekile!",
+                welcomeBack: "Wamukelekile futhi",
+                controlBudget: "Hlala ulawula isabelo sakho sokubheja",
+                availableBalance: "Ibalansi etholakalayo",
+                monthlyBudget: "Isabelo sanyanga",
+                totalSpent: "Inani elichithiwe",
+                daysLeft: "Izinsali zosuku zale nyanga",
+                monthlyBudgetProgress: "Intuthuko yesabelo sanyanga",
+                quickActions: "Izenzo ezisheshayo",
+                customAmount: "Inani elikhethekile",
+                recentActivity: "Umsebenzi wakamuva",
+                noSpending: "Azikho izindleko ezirekhodiwe okwamanje",
+                addFirstExpense: "Faka isindleko sakho sokuqala",
+                addCustomExpense: "Faka isindleko ekhethekile",
+                amount: "Inani (R):",
+                bettingSite: "Indawo yokubheja:",
+                selectSite: "Khetha indawo",
+                other: "Okunye",
+                cancel: "Khansela",
+                addExpense: "Faka isindleko",
+                logout: "Phuma"
+            }
+        };
+
+        // Load user data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔄 Loading dashboard...');
+            loadDashboard();
+            loadUserLanguage();
+        });
+
+        async function loadUserLanguage() {
+            try {
+                const storedUser = localStorage.getItem('userData');
+                if (storedUser) {
+                    const user = JSON.parse(storedUser);
+                    if (user.preferred_language) {
+                        currentLanguage = user.preferred_language;
+                        document.getElementById('languageSwitch').value = currentLanguage;
+                        translatePage();
+                    }
+                }
+            } catch (error) {
+                console.log('Could not load user language, using default');
+            }
+        }
+
+        function switchLanguage(lang) {
+            currentLanguage = lang;
+            translatePage();
+            
+            // Save language preference
+            if (currentUser) {
+                fetch('/api/update-language', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        language: lang
+                    })
+                }).catch(error => console.log('Language save failed:', error));
+            }
+        }
+
+        function translatePage() {
+            const elements = document.querySelectorAll('[data-translate]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (translations[currentLanguage] && translations[currentLanguage][key]) {
+                    if (element.type === 'submit' || element.tagName === 'BUTTON') {
+                        element.textContent = translations[currentLanguage][key];
+                    } else if (element.placeholder) {
+                        element.placeholder = translations[currentLanguage][key];
+                    } else {
+                        element.textContent = translations[currentLanguage][key];
+                    }
+                }
+            });
+            
+            // Update dynamic text based on language
+            updateProgressText();
+        }
+
+        function updateProgressText() {
+            const currentBalance = parseFloat(document.getElementById('currentBalance').textContent.replace('R ', '')) || 0;
+            const progressText = document.getElementById('progressText');
+            
+            if (currentLanguage === 'zu') {
+                progressText.textContent = `Unayo i-R ${currentBalance.toFixed(2)} eseleyo kule nyanga`;
+            } else if (currentLanguage === 'xh') {
+                progressText.textContent = `Uno R ${currentBalance.toFixed(2)} ashiye kule nyanga`;
+            } else if (currentLanguage === 'af') {
+                progressText.textContent = `Jy het R ${currentBalance.toFixed(2)} oor vir hierdie maand`;
+            } else if (currentLanguage === 'nso') {
+                progressText.textContent = `O na le R ${currentBalance.toFixed(2)} a šetšego kgweding ye`;
+            } else if (currentLanguage === 'st') {
+                progressText.textContent = `U na le R ${currentBalance.toFixed(2)} setseng khoeling ena`;
+            } else if (currentLanguage === 'tn') {
+                progressText.textContent = `O na le R ${currentBalance.toFixed(2)} a setseng mo ngweding eno`;
+            } else if (currentLanguage === 'ts') {
+                progressText.textContent = `U na R ${currentBalance.toFixed(2)} a saleke eka n'weti lowu`;
+            } else if (currentLanguage === 'ss') {
+                progressText.textContent = `Unalo R ${currentBalance.toFixed(2)} asele enyangeni lena`;
+            } else if (currentLanguage === 've') {
+                progressText.textContent = `U na R ${currentBalance.toFixed(2)} o salela kha mvedzi uno`;
+            } else if (currentLanguage === 'nr') {
+                progressText.textContent = `Unayo i-R ${currentBalance.toFixed(2)} eseleyo kule nyanga`;
+            } else {
+                progressText.textContent = `You have R ${currentBalance.toFixed(2)} left for this month`;
+            }
+        }
+
+        async function loadDashboard() {
+            try {
+                // Get user from localStorage
+                const storedUser = localStorage.getItem('userData');
+                if (!storedUser) {
+                    alert('Please login first');
+                    window.location.href = '/';
+                    return;
+                }
+                
+                currentUser = JSON.parse(storedUser);
+                console.log('👤 Current user:', currentUser);
+                
+                // Load fresh data from server
+                const response = await fetch(`/api/user-data/${currentUser.id}`);
+                const data = await response.json();
+                
+                console.log('📊 Server response:', data);
+                
+                if (data.success) {
+                    updateDashboard(data.user, data.recent_expenses || []);
+                    translatePage();
+                } else {
+                    showAlert('Failed to load dashboard data', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                showAlert('Error loading dashboard', 'error');
+            }
+        }
+
+        function updateDashboard(user, expenses) {
+            console.log('🔄 Updating dashboard with:', user);
+            
+            const monthlyBudget = parseFloat(user.monthly_budget) || 0;
+            const currentBalance = parseFloat(user.current_balance) || 0;
+            const totalSpent = monthlyBudget - currentBalance;
+            const progressPercentage = monthlyBudget > 0 ? (totalSpent / monthlyBudget) * 100 : 0;
+            
+            // Update DOM
+            document.getElementById('userName').textContent = user.name || 'User';
+            document.getElementById('currentBalance').textContent = `R ${currentBalance.toFixed(2)}`;
+            document.getElementById('monthlyBudget').textContent = `R ${monthlyBudget.toFixed(2)}`;
+            document.getElementById('totalSpent').textContent = `R ${totalSpent.toFixed(2)}`;
+            
+            // Progress bar
+            document.getElementById('progressFill').style.width = `${Math.min(progressPercentage, 100)}%`;
+            document.getElementById('progressPercentage').textContent = `${Math.round(progressPercentage)}%`;
+            
+            // Update progress text based on language
+            updateProgressText();
+            
+            // Update recent activity
+            updateRecentActivity(expenses);
+            
+            console.log('✅ Dashboard updated successfully!');
+        }
+
+        function updateRecentActivity(expenses) {
+            const activityList = document.getElementById('recentActivity');
+            
+            if (expenses.length === 0) {
+                const noSpendingText = translations[currentLanguage]?.noSpending || 'No spending recorded yet';
+                const addFirstText = translations[currentLanguage]?.addFirstExpense || 'Add Your First Expense';
+                
+                activityList.innerHTML = `
+                    <div class="empty-state">
+                        <p>${noSpendingText}</p>
+                        <button onclick="showCustomAmount()">${addFirstText}</button>
+                    </div>
+                `;
+                return;
+            }
+
+            activityList.innerHTML = expenses.map(expense => {
+                const date = new Date(expense.date_time);
+                const atText = currentLanguage === 'zu' ? 'ku' : 
+                              currentLanguage === 'xh' ? 'kwi' :
+                              currentLanguage === 'af' ? 'by' :
+                              currentLanguage === 'nso' ? 'go' :
+                              currentLanguage === 'st' ? 'ho' :
+                              currentLanguage === 'tn' ? 'go' :
+                              currentLanguage === 'ts' ? 'eka' :
+                              currentLanguage === 'ss' ? 'ku' :
+                              currentLanguage === 've' ? 'kha' :
+                              currentLanguage === 'nr' ? 'ku' : 'at';
+                
+                return `
+                    <div class="activity-item">
+                        <div class="activity-details">
+                            <strong>R ${parseFloat(expense.amount).toFixed(2)}</strong>
+                            <span>${atText} ${expense.betting_site || 'Unknown Site'}</span>
+                            <small>${date.toLocaleDateString()}</small>
+                        </div>
+                        <div class="activity-category">
+                            ${expense.category || 'General'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.getElementById('alertMessage');
+            const alertSection = document.getElementById('alertSection');
+            alertDiv.textContent = message;
+            alertDiv.className = `alert alert-${type}`;
+            alertSection.style.display = 'block';
+            
+            setTimeout(() => {
+                alertSection.style.display = 'none';
+            }, 5000);
+        }
+
+        // EXPENSE FUNCTIONS
+        async function quickAddExpense(amount) {
+            await addExpense(amount, 'Quick Add');
+        }
+
+        async function addExpense(amount, bettingSite) {
+            try {
+                console.log('💸 Adding expense:', amount);
+                
+                const response = await fetch('/api/add-expense', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        amount: amount,
+                        betting_site: bettingSite,
+                        category: 'General'
+                    })
+                });
+
+                const data = await response.json();
+                console.log('📥 Expense response:', data);
+                
+                if (data.success) {
+                    // Show success message in current language
+                    let successMessage = `Expense of R ${amount} added successfully!`;
+                    if (currentLanguage === 'zu') successMessage = `Kufakwe isindleko se-R ${amount} ngempumelelo!`;
+                    else if (currentLanguage === 'xh') successMessage = `Umchitho we R ${amount} wongezwe ngempumelelo!`;
+                    else if (currentLanguage === 'af') successMessage = `Uitgawe van R ${amount} suksesvol bygevoeg!`;
+                    else if (currentLanguage === 'nso') successMessage = `Ditefogo tša R ${amount} di loketšwe ka katlego!`;
+                    else if (currentLanguage === 'st') successMessage = `Tekanyetso ea R ${amount} e kentsoe ka katleho!`;
+                    else if (currentLanguage === 'tn') successMessage = `Ditshenyegelo tsa R ${amount} di tsenngwe ka katlego!`;
+                    else if (currentLanguage === 'ts') successMessage = `Ndzhimalo wa R ${amount} wu ngeletiwe hi ku humelela!`;
+                    else if (currentLanguage === 'ss') successMessage = `Incenyeti ye R ${amount} ingenise ngephumelelo!`;
+                    else if (currentLanguage === 've') successMessage = `Tshifhinga tsha R ${amount} tsha dzheniswa nga u faro!`;
+                    else if (currentLanguage === 'nr') successMessage = `Kufakwe isindleko se-R ${amount} ngempumelelo!`;
+                    
+                    showAlert(successMessage, 'success');
+                    
+                    // Reload dashboard
+                    loadDashboard();
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error adding expense:', error);
+                showAlert('Failed to add expense', 'error');
+            }
+        }
+
+        // MODAL FUNCTIONS
+        function showCustomAmount() {
+            document.getElementById('customAmountModal').style.display = 'flex';
+        }
+
+        function hideCustomAmount() {
+            document.getElementById('customAmountModal').style.display = 'none';
+        }
+
+        // Handle custom expense form
+        document.getElementById('customExpenseForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const amount = parseFloat(document.getElementById('customAmount').value);
+            const bettingSite = document.getElementById('bettingSite').value;
+
+            if (!amount || amount <= 0) {
+                let message = 'Please enter a valid amount';
+                if (currentLanguage === 'zu') message = 'Sicela ufake inani elivumelekile';
+                else if (currentLanguage === 'xh') message = 'Nceda ufake inani elisemthethweni';
+                else if (currentLanguage === 'af') message = 'Voer asseblief \'n geldige bedrag in';
+                else if (currentLanguage === 'nso') message = 'Hle tsenya tekanyo e nepagetšego';
+                else if (currentLanguage === 'st') message = 'Ka kopo, kenya chelete e nepahetseng';
+                else if (currentLanguage === 'tn') message = 'Ka kopo, tsenya madi a a siameng';
+                else if (currentLanguage === 'ts') message = 'Hi kombela, u ngeleta mali leyi faneleke';
+                else if (currentLanguage === 'ss') message = 'Sicela ufake inani lelisemtsetfweni';
+                else if (currentLanguage === 've') message = 'Thabela, u nge tshelede yo teaho';
+                else if (currentLanguage === 'nr') message = 'Sicela ufake inani elivumelekile';
+                
+                alert(message);
+                return;
+            }
+
+            if (!bettingSite) {
+                let message = 'Please select a betting site';
+                if (currentLanguage === 'zu') message = 'Sicela ukhethe isiza sokubheja';
+                else if (currentLanguage === 'xh') message = 'Nceda ukhethe indawo yokubheja';
+                else if (currentLanguage === 'af') message = 'Kies asseblief \'n dobbelwebwerf';
+                else if (currentLanguage === 'nso') message = 'Hle kgetha sebaka sa go matha mabakgakala';
+                else if (currentLanguage === 'st') message = 'Ka kopo, khetha sebaka sa ho bapala marabaraba';
+                else if (currentLanguage === 'tn') message = 'Ka kopo, kgetha lefelo la go tshela mabakgakala';
+                else if (currentLanguage === 'ts') message = 'Hi kombela, u hlole xikandza xa ku tlhela mabangi';
+                else if (currentLanguage === 'ss') message = 'Sicela ukhetse indzawo yekudlala imijovo';
+                else if (currentLanguage === 've') message = 'Thabela, u nange fhethu ha u bheja';
+                else if (currentLanguage === 'nr') message = 'Sicela ukhethe indawo yokubheja';
+                
+                alert(message);
+                return;
+            }
+
+            await addExpense(amount, bettingSite);
+            hideCustomAmount();
+            
+            // Reset form
+            document.getElementById('customAmount').value = '';
+            document.getElementById('bettingSite').selectedIndex = 0;
+        });
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('customAmountModal');
+            if (e.target === modal) {
+                hideCustomAmount();
+            }
+        });
+
+        // LOGOUT
+        function logout() {
+            let message = 'Are you sure you want to logout?';
+            
+            if (currentLanguage === 'zu') message = 'Uqinisekile ukuthi ufuna ukuphuma?';
+            else if (currentLanguage === 'xh') message = 'Uqinisekile ukuba ufuna ukuphuma?';
+            else if (currentLanguage === 'af') message = 'Is jy seker jy wil afmeld?';
+            else if (currentLanguage === 'nso') message = 'O na le bonnete bja gore o nyaka go tšwa?';
+            else if (currentLanguage === 'st') message = 'Na u na le bonnete ba hore u batla ho kena?';
+            else if (currentLanguage === 'tn') message = 'A o na le bonnete jwa gore o batla go tswa?';
+            else if (currentLanguage === 'ts') message = 'Xana u na vuxokoxoko bya leswaku u lava ku huma?';
+            else if (currentLanguage === 'ss') message = 'Uqinisekile kutsi ufuna kuphuma?';
+            else if (currentLanguage === 've') message = 'Naa u na vhutanzi ha uri u toda u bva?';
+            else if (currentLanguage === 'nr') message = 'Uqinisekile ukuthi ufuna ukuphuma?';
+            
+            if (confirm(message)) {
+                localStorage.removeItem('userData');
+                window.location.href = '/';
+            }
+        }
+
+        console.log('✅ Dashboard with 11 languages loaded successfully!');
+    </script>
+</body>
+</html>

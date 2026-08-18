@@ -1,0 +1,94 @@
+﻿/* Huawei-Inspired Professional Design System */
+:root {
+    --huawei-red: #CF0A2C;
+    --huawei-dark: #1A1A1A;
+    --huawei-gray: #2D2D2D;
+    --huawei-light-gray: #F5F5F5;
+    --huawei-white: #FFFFFF;
+    --gradient-primary: linear-gradient(135deg, #CF0A2C 0%, #9B0B23 100%);
+    --shadow-premium: 0 8px 30px rgba(0,0,0,0.12);
+    --border-radius: 12px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--huawei-light-gray);
+    line-height: 1.6;
+    color: var(--huawei-dark);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.navbar {
+    background: var(--huawei-white);
+    box-shadow: var(--shadow-premium);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+}
+
+.nav-logo h2 {
+    color: var(--huawei-red);
+    font-weight: 700;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.logout-btn {
+    background: var(--huawei-red);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    background: #9B0B23;
+    transform: translateY(-2px);
+}
+
+.language-selector {
+    margin-right: 20px;
+}
+
+.language-selector select {
+    padding: 8px 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    background: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.language-selector select:focus {
+    border-color: #CF0A2C;
+    outline: none;
+}
