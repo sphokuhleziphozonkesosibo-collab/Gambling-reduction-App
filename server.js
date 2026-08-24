@@ -2,7 +2,8 @@
 
 const express = require("express");
 const path = require("path");
-const mysql = require('mysql2');
+const fs = require("fs");
+const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -11,239 +12,293 @@ const session = require('express-session');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ FIXED: Enhanced middleware configuration
-app.use(helmet({
-    contentSecurityPolicy: false
-}));
-
+app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 
-// ✅ FIXED: Proper static file serving
-app.use(express.static(path.join(__dirname, "public"), {
-    index: false, // Don't serve index.html automatically
-    extensions: ['html', 'htm'] // Explicitly serve these extensions
-}));
-
-// ✅ SESSION MANAGEMENT
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'fallback-secret-key-change-in-production',
+    secret: process.env.SESSION_SECRET || 'betaware-sa-secret-2026',
     resave: false,
     saveUninitialized: false,
-    cookie: { 
-        secure: false,
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000
-    }
+    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
 }));
 
-// ✅ RATE LIMITING
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 10,
-    message: { success: false, message: "Too many attempts" }
+    max: 40,
+    message: { success: false, message: "Too many attempts, please try again later." }
 });
 
-app.use('/login', authLimiter);
-app.use('/register', authLimiter);
-
-// ✅ DATABASE CONNECTION
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER, 
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
+const pool = mysql.createPool({
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'betaware_db',
+    waitForConnections: true,
+    connectionLimit: 10
 });
 
-db.connect((err) => {
-    if (err) {
-        console.log('❌ Database connection failed:', err.message);
-        return;
+// ✅ RISK & BREACH ALERT ENGINE
+const SARGF_HOTLINE = {
+    phone: "0800 006 008",
+    whatsapp: "076 675 0710"
+};
+
+function calculateRiskStatus(current_balance, monthly_budget) {
+    const balance = parseFloat(current_balance);
+    const budget = parseFloat(monthly_budget);
+    const percentRemaining = budget > 0 ? (balance / budget) * 100 : 0;
+
+    if (balance <= 0) {
+        return {
+            risk_level: 'critical_breach',
+            percent_remaining: Math.max(0, Math.round(percentRemaining)),
+            message: "You've reached your monthly limit. Please stop and consider reaching out for support.",
+            sargf: SARGF_HOTLINE
+        };
     }
-    console.log('✅ Connected to MySQL database');
-});
-
-// ✅ FIXED: EXPLICIT ROUTES
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'login.html'));
-});
-
-app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'login.html'));
-});
-
-app.get('/register', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'register.html'));
-});
-
-app.get('/dashboard', (req, res) => {
-    if (!req.session.userId) {
-        return res.redirect('/');
+    if (percentRemaining <= 20) {
+        return {
+            risk_level: 'warning',
+            percent_remaining: Math.round(percentRemaining),
+            message: "You've used 80% or more of your monthly budget. Slow down.",
+            sargf: null
+        };
     }
-    res.sendFile(path.join(__dirname, 'public', 'views', 'dashboard.html'));
-});
+    return {
+        risk_level: 'safe',
+        percent_remaining: Math.round(percentRemaining),
+        message: null,
+        sargf: null
+    };
+}
 
-// ✅ FIXED: Serve CSS and JS files explicitly
-app.get('/css/:filename', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'css', req.params.filename));
-});
-
-app.get('/js/:filename', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'js', req.params.filename));
-});
-
-// ✅ LOGIN ENDPOINT
-app.post("/login", (req, res) => {
-    console.log('🔐 Login attempt:', req.body.email);
-    
-    const { email, password } = req.body;
-    
-    if (!email || !password) {
-        return res.json({ success: false, message: "Email and password required" });
+// Universal file routing
+function serveHtml(res, filename) {
+    const paths = [
+        path.join(__dirname, 'public', 'views', filename),
+        path.join(__dirname, 'views', filename),
+        path.join(__dirname, 'public', filename),
+        path.join(__dirname, filename)
+    ];
+    for (const p of paths) {
+        if (fs.existsSync(p)) return res.sendFile(p);
     }
-    
-    const sql = "SELECT * FROM users WHERE email = ?";
-    db.query(sql, [email], async (err, results) => {
-        if (err) {
-            console.error("Database error:", err);
-            return res.json({ success: false, message: "Server error" });
-        }
-        
-        if (results.length === 0) {
-            return res.json({ success: false, message: "User not found" });
-        }
-        
-        const user = results[0];
-        
-        try {
-            const isPasswordValid = await bcrypt.compare(password, user.password_hash);
-            
-            if (!isPasswordValid) {
-                return res.json({ success: false, message: "Invalid password" });
-            }
-            
-            // Create session
-            req.session.userId = user.id;
-            req.session.userEmail = user.email;
-            req.session.userName = user.name;
-            req.session.userLanguage = user.preferred_language || 'en';
-            
-            console.log('✅ Login successful for:', user.name);
-            
-            res.json({ 
-                success: true, 
-                message: "Login successful!",
-                user: {
-                    id: user.id,
-                    name: user.name,
-                    monthly_budget: parseFloat(user.monthly_budget),
-                    current_balance: parseFloat(user.current_balance),
-                    preferred_language: user.preferred_language || 'en'
-                }
-            });
-            
-        } catch (error) {
-            console.error("Password error:", error);
-            res.json({ success: false, message: "Login failed" });
-        }
-    });
-});
+    res.status(404).send(`<h3>${filename} not found</h3>`);
+}
 
-// ✅ REGISTER ENDPOINT (keep your existing register code)
-app.post("/register", async (req, res) => {
-    console.log('📝 Registration attempt:', req.body.email);
-    
+app.get(['/', '/login', '/login.html'], (req, res) => serveHtml(res, 'login.html'));
+app.get(['/register', '/register.html'], (req, res) => serveHtml(res, 'register.html'));
+app.get(['/dashboard', '/dashboard.html'], (req, res) => serveHtml(res, 'dashboard.html'));
+
+// 🔐 AUTH
+app.post("/register", authLimiter, async (req, res) => {
     const { name, email, password, monthly_salary, betting_percentage = 10, preferred_language = 'en' } = req.body;
-    
-    // ✅ VALIDATE LANGUAGE
-    const validLanguages = ['en', 'zu', 'af', 'xh', 'nso', 'st', 'tn', 'ts', 'ss', 've', 'nr'];
-    const finalLanguage = validLanguages.includes(preferred_language) ? preferred_language : 'en';
-    
-    // Validation
     if (!name || !email || !password || !monthly_salary) {
-        return res.json({ success: false, message: "All fields required" });
+        return res.json({ success: false, message: "All fields are required" });
     }
-    
     if (password.length < 6) {
-        return res.json({ success: false, message: "Password must be 6+ characters" });
+        return res.json({ success: false, message: "Password must be at least 6 characters" });
     }
-    
+
     try {
+        const [existing] = await pool.query("SELECT id FROM users WHERE email = ?", [email]);
+        if (existing.length > 0) return res.json({ success: false, message: "Email already registered" });
+
         const password_hash = await bcrypt.hash(password, 10);
-        const monthly_budget = monthly_salary * (betting_percentage / 100);
-        const current_balance = monthly_budget;
-        
-        const sql = `INSERT INTO users (name, email, password_hash, monthly_salary, betting_percentage, monthly_budget, current_balance, preferred_language) 
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-        
-        db.query(sql, [name, email, password_hash, monthly_salary, betting_percentage, monthly_budget, current_balance, finalLanguage], 
-            (err, result) => {
-                if (err) {
-                    console.log("Registration error:", err.message);
-                    if (err.code === 'ER_DUP_ENTRY') {
-                        return res.json({ success: false, message: "Email already exists" });
-                    }
-                    return res.json({ success: false, message: "Registration failed" });
-                }
-                
-                console.log("✅ User registered:", name, "Language:", finalLanguage);
-                
-                // Auto-login after registration
-                req.session.userId = result.insertId;
-                req.session.userEmail = email;
-                req.session.userName = name;
-                req.session.userLanguage = finalLanguage;
-                
-                res.json({ 
-                    success: true, 
-                    message: "Registration successful!",
-                    user: {
-                        id: result.insertId,
-                        name: name,
-                        monthly_budget: monthly_budget,
-                        current_balance: current_balance,
-                        preferred_language: finalLanguage
-                    }
-                });
-            }
+        const monthly_budget = parseFloat(monthly_salary) * (parseFloat(betting_percentage) / 100);
+
+        const [result] = await pool.query(
+            `INSERT INTO users (name, email, password_hash, monthly_salary, betting_percentage, monthly_budget, current_balance, preferred_language) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            [name, email, password_hash, monthly_salary, betting_percentage, monthly_budget, monthly_budget, preferred_language]
         );
-    } catch (error) {
-        console.error("Registration error:", error);
-        res.json({ success: false, message: "Registration failed" });
+
+        req.session.userId = result.insertId;
+        res.json({
+            success: true,
+            user: { id: result.insertId, name, email, monthly_budget, current_balance: monthly_budget, preferred_language }
+        });
+    } catch (err) {
+        res.json({ success: false, message: err.message });
     }
 });
 
-// ✅ KEEP ALL YOUR OTHER ENDPOINTS (update-language, add-expense, user-data, etc.)
-// ... (include all your existing API endpoints here)
+app.post("/login", authLimiter, async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const [users] = await pool.query("SELECT * FROM users WHERE email = ?", [email]);
+        if (users.length === 0) return res.json({ success: false, message: "Invalid email or password" });
 
-// ✅ HEALTH CHECK
-app.get("/health", (req, res) => {
-    res.json({ 
-        status: 'healthy', 
-        database: 'connected',
-        timestamp: new Date().toISOString()
-    });
+        const user = users[0];
+        const isMatch = await bcrypt.compare(password, user.password_hash);
+        if (!isMatch) return res.json({ success: false, message: "Invalid email or password" });
+
+        req.session.userId = user.id;
+        res.json({
+            success: true,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                monthly_budget: parseFloat(user.monthly_budget),
+                current_balance: parseFloat(user.current_balance),
+                preferred_language: user.preferred_language || 'en'
+            }
+        });
+    } catch (err) {
+        res.json({ success: false, message: "Login error" });
+    }
 });
 
-// ✅ 404 Handler - FIXED
-app.use((req, res) => {
-    res.status(404).send(`
-        <html>
-            <body>
-                <h1>404 - Page Not Found</h1>
-                <p>The page you are looking for does not exist.</p>
-                <a href="/">Go to Login</a>
-            </body>
-        </html>
-    `);
+app.post("/logout", (req, res) => req.session.destroy(() => res.json({ success: true })));
+
+// 📊 DASHBOARD & EXPENSES API
+app.get("/api/user-data/:userId", async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const [users] = await pool.query("SELECT id, name, email, monthly_budget, current_balance, preferred_language FROM users WHERE id = ?", [userId]);
+        if (users.length === 0) return res.json({ success: false, message: "User not found" });
+
+        const [expenses] = await pool.query("SELECT * FROM expenses WHERE user_id = ? ORDER BY date_time DESC LIMIT 15", [userId]);
+
+        const [platforms] = await pool.query(
+            "SELECT betting_site, SUM(amount) as total_spent, COUNT(*) as bet_count FROM expenses WHERE user_id = ? GROUP BY betting_site ORDER BY total_spent DESC",
+            [userId]
+        );
+
+        const risk = calculateRiskStatus(users[0].current_balance, users[0].monthly_budget);
+
+        const [exclusions] = await pool.query(
+            "SELECT * FROM self_exclusions WHERE user_id = ? ORDER BY started_at DESC LIMIT 1",
+            [userId]
+        );
+        const activeExclusion = exclusions.length > 0 ? exclusions[0] : null;
+
+        res.json({
+            success: true,
+            user: users[0],
+            recent_expenses: expenses,
+            platform_breakdown: platforms,
+            risk_status: risk,
+            self_exclusion: activeExclusion
+        });
+    } catch (err) {
+        res.json({ success: false, message: err.message });
+    }
 });
 
-// Start server
+app.post("/api/add-expense", async (req, res) => {
+    const { user_id, amount, betting_site, category = 'General' } = req.body;
+    const expenseAmount = parseFloat(amount);
+    if (!user_id || isNaN(expenseAmount) || expenseAmount <= 0) {
+        return res.json({ success: false, message: "Invalid amount or user" });
+    }
+
+    try {
+        const [exclusions] = await pool.query(
+            "SELECT * FROM self_exclusions WHERE user_id = ? AND status = 'Active' ORDER BY started_at DESC LIMIT 1",
+            [user_id]
+        );
+        if (exclusions.length > 0) {
+            return res.json({
+                success: false,
+                message: "You have an active self-exclusion in place. Logging new bets is disabled.",
+                self_excluded: true
+            });
+        }
+
+        await pool.query(
+            "INSERT INTO expenses (user_id, amount, betting_site, category, date_time) VALUES (?, ?, ?, ?, NOW())",
+            [user_id, expenseAmount, betting_site || 'Other', category]
+        );
+        await pool.query("UPDATE users SET current_balance = current_balance - ? WHERE id = ?", [expenseAmount, user_id]);
+
+        const [rows] = await pool.query("SELECT current_balance, monthly_budget FROM users WHERE id = ?", [user_id]);
+        const risk = calculateRiskStatus(rows[0].current_balance, rows[0].monthly_budget);
+
+        res.json({
+            success: true,
+            message: "Expense recorded",
+            new_balance: parseFloat(rows[0].current_balance),
+            risk_status: risk
+        });
+    } catch (err) {
+        res.json({ success: false, message: err.message });
+    }
+});
+
+// 📱 South African Bank SMS Parser
+app.post("/api/parse-sms", (req, res) => {
+    const { smsText } = req.body;
+    if (!smsText) return res.json({ success: false, message: "No SMS text provided" });
+
+    const amountMatch = smsText.match(/(?:R|ZAR)\s*([\d,]+\.?\d*)/i);
+    let extractedAmount = amountMatch ? parseFloat(amountMatch[1].replace(',', '')) : null;
+
+    const lower = smsText.toLowerCase();
+    let detectedSite = "Other";
+
+    if (lower.includes("hollywood") || lower.includes("spina")) detectedSite = "Hollywood Bets";
+    else if (lower.includes("betway")) detectedSite = "Betway";
+    else if (lower.includes("sportingbet")) detectedSite = "Sportingbet";
+    else if (lower.includes("supabets")) detectedSite = "Supabets";
+    else if (lower.includes("lotto") || lower.includes("ithuba")) detectedSite = "Lotto";
+    else if (lower.includes("sunbet")) detectedSite = "SunBet";
+
+    if (extractedAmount) {
+        res.json({ success: true, amount: extractedAmount, site: detectedSite });
+    } else {
+        res.json({ success: false, message: "Could not automatically detect amount from SMS text." });
+    }
+});
+
+// 🌐 Language Update
+app.post("/api/update-language", async (req, res) => {
+    const { user_id, language } = req.body;
+    try {
+        await pool.query("UPDATE users SET preferred_language = ? WHERE id = ?", [language, user_id]);
+        res.json({ success: true });
+    } catch (err) {
+        res.json({ success: false });
+    }
+});
+
+// 🛡️ NATIONAL SELF-EXCLUSION
+app.post("/api/self-exclude", async (req, res) => {
+    const { user_id, period_months = 6 } = req.body;
+    if (!user_id) {
+        return res.json({ success: false, message: "Missing user" });
+    }
+
+    try {
+        const [existing] = await pool.query(
+            "SELECT id FROM self_exclusions WHERE user_id = ? AND status IN ('Requested', 'Active')",
+            [user_id]
+        );
+        if (existing.length > 0) {
+            return res.json({ success: false, message: "You already have an active self-exclusion request." });
+        }
+
+        const [result] = await pool.query(
+            "INSERT INTO self_exclusions (user_id, status, period_months, started_at) VALUES (?, 'Active', ?, NOW())",
+            [user_id, period_months]
+        );
+
+        res.json({
+            success: true,
+            message: "Self-exclusion activated. Quick-add betting buttons are now disabled.",
+            exclusion_id: result.insertId,
+            sargf: SARGF_HOTLINE
+        });
+    } catch (err) {
+        res.json({ success: false, message: err.message });
+    }
+});
+
 app.listen(PORT, () => {
-    console.log("=".repeat(60));
-    console.log("🚀 BetAware SA Server RUNNING - FIXED VERSION");
-    console.log("=".repeat(60));
-    console.log(`📍 URL: http://localhost:${PORT}`);
-    console.log(`📁 Serving from: ${__dirname}`);
-    console.log("=".repeat(60));
+    console.log(`🚀 BetAware SA Enterprise running on http://localhost:${PORT}`);
+    console.log(`🚨 Risk alert engine: ACTIVE`);
+    console.log(`🛡️  Self-exclusion engine: ACTIVE`);
 });
