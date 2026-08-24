@@ -50,9 +50,20 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
         console.log('Registration response:', data);
         
         if (data.success) {
-            alert('✅ ' + data.message + '\n\nYour monthly betting budget: R ' + data.user_budget.toLocaleString() + 
-                  '\n\nRemember: This is your MAXIMUM spending limit for betting this month!');
-            window.location.href = 'login.html';
+            // Save the logged-in user so dashboard.html and
+            // pgsi-assessment.html can read it from localStorage
+            localStorage.setItem('userData', JSON.stringify(data.user));
+
+            alert('✅ Account created!\n\nYour monthly betting budget: R ' + data.user.monthly_budget.toLocaleString() +
+                  '\n\nNext, you\'ll take a quick 2-minute screening so we can tailor your experience.');
+
+            // New users go straight to the PGSI screening first,
+            // not back to the login page — they're already authenticated.
+            if (data.needs_pgsi) {
+                window.location.href = '/pgsi-assessment';
+            } else {
+                window.location.href = '/dashboard';
+            }
         } else {
             alert('❌ ' + data.message);
         }

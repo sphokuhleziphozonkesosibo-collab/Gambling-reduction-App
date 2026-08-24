@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gambling Screening - BetAware SA</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #CF0A2C 0%, #9B0B23 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 30px 15px;
+        }
+        .wrap {
+            max-width: 620px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 15px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            font-size: 1.4rem;
+            color: #1f2937;
+            margin-bottom: 6px;
+        }
+        .intro {
+            font-size: 0.9rem;
+            color: #6b7280;
+            line-height: 1.5;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .progress-bar {
+            height: 6px;
+            background: #eee;
+            border-radius: 3px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #CF0A2C;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .question {
+            margin-bottom: 26px;
+            padding-bottom: 22px;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        .question:last-of-type { border-bottom: none; }
+        .q-num {
+            display: inline-block;
+            background: #fef2f2;
+            color: #CF0A2C;
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 3px 9px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+        }
+        .q-text {
+            font-size: 0.95rem;
+            color: #1f2937;
+            font-weight: 600;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        @media (max-width: 480px) {
+            .options { grid-template-columns: 1fr; }
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #374151;
+            transition: all 0.15s;
+        }
+        .option:hover { border-color: #CF0A2C; }
+        .option input { accent-color: #CF0A2C; }
+        .option.selected {
+            border-color: #CF0A2C;
+            background: #fef2f2;
+            font-weight: 600;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: #CF0A2C;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .submit-btn:hover:not(:disabled) { background: #9B0B23; }
+        .error-msg {
+            color: #dc2626;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            display: none;
+        }
+
+        /* Results screen */
+        .results { display: none; text-align: center; }
+        .score-circle {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            margin: 0 auto 20px;
+            color: #fff;
+        }
+        .score-circle .num { font-size: 2rem; font-weight: 800; line-height: 1; }
+        .score-circle .out-of { font-size: 0.7rem; opacity: 0.85; }
+        .risk-non_problem { background: #16a34a; }
+        .risk-low_risk { background: #65a30d; }
+        .risk-moderate_risk { background: #f59e0b; }
+        .risk-problem_gambler { background: #dc2626; }
+        .risk-label {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .risk-desc {
+            font-size: 0.9rem;
+            color: #4b5563;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        .sargf-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: left;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .sargf-box p { margin: 6px 0; font-size: 0.85rem; color: #7f1d1d; }
+        .continue-btn {
+            width: 100%;
+            padding: 14px;
+            background: #1f2937;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+
+        <!-- QUIZ SCREEN -->
+        <div id="quizScreen">
+            <h1>🩺 Gambling Screening (PGSI)</h1>
+            <p class="intro">
+                This is the Problem Gambling Severity Index — the same standardized 9-question
+                screening tool used by health professionals. It takes about 2 minutes and helps
+                BetAware SA tailor your experience. Answer honestly — there are no wrong answers,
+                and nothing here is shared beyond your own account.
+            </p>
+
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+            <form id="pgsiForm">
+                <div class="question" data-q="0">
+                    <span class="q-num">Question 1 of 9</span>
+                    <div class="q-text">Thinking about the last 12 months, have you bet more than you could really afford to lose?</div>
+                    <div class="options"></div>
+                </div>
+                <div class="question" data-q="1">
+                    <span class="q-num">Question 2 of 9</span>
+                    <div class="q-text">Still thinking about the last 12 months, have you needed to gamble with larger amounts of money to get the same feeling of excitement?</div>
+                    <div class="options"></div>
+                </div>
+                <div class="question" data-q="2">
+                    <span class="q-num">Question 3 of 9</span>
+                    <div class="q-text">When you gambled, did you go back another day to try to win back the money you lost?</div>
+                    <div class="options"></div>
+                </div>
+                <div class="question" data-q="3">
+                    <span class="q-num">Question 4 of 9</span>
+                    <div class="q-text">Have you borrowed money or sold anything to get money to gamble?</div>
+                    <div class="options"></div>
+                </div>
+                <div class="question" data-q="4">
+                    <span class="q-num">Question 5 of 9</span>
+                    <div class="q-text">Have you felt that you might have a problem with gambling?</div>
+                    <div class="options"></div>
+                </div>
+                <div class="question" data-q="5">
+                    <span class="q-num">Question 6 of 9</span>
+                    <div class="q-text">Has gambling caused you any health problems, including stress or anxiety?</div>
+                    <div class="options"></div>
+                </div>
+                <div class="question" data-q="6">
+                    <span class="q-num">Question 7 of 9</span>
+                    <div class="q-text">Have people criticized your betting or told you that you had a gambling problem, whether or not you thought it was true?</div>
+                    <div class="options"></div>
+                </div>
+                <div class="question" data-q="7">
+                    <span class="q-num">Question 8 of 9</span>
+                    <div class="q-text">Has your gambling caused any financial problems for you or your household?</div>
+                    <div class="options"></div>
+                </div>
+                <div class="question" data-q="8">
+                    <span class="q-num">Question 9 of 9</span>
+                    <div class="q-text">Have you felt guilty about the way you gamble, or what happens when you gamble?</div>
+                    <div class="options"></div>
+                </div>
+
+                <div class="error-msg" id="errorMsg">Please answer all 9 questions before submitting.</div>
+                <button type="submit" class="submit-btn" id="submitBtn">See My Results</button>
+            </form>
+        </div>
+
+        <!-- RESULTS SCREEN -->
+        <div class="results" id="resultsScreen">
+            <div class="score-circle" id="scoreCircle">
+                <div class="num" id="scoreNum">0</div>
+                <div class="out-of">out of 27</div>
+            </div>
+            <div class="risk-label" id="riskLabel"></div>
+            <div class="risk-desc" id="riskDesc"></div>
+            <div class="sargf-box" id="sargfBox">
+                <strong>Free, confidential support is available:</strong>
+                <p>📞 SARGF National Helpline: <a href="tel:0800006008">0800 006 008</a> (toll-free)</p>
+                <p>💬 WhatsApp Support: <a href="https://wa.me/27766750710" target="_blank">076 675 0710</a></p>
+            </div>
+            <button class="continue-btn" onclick="goToDashboard()">Continue to Dashboard</button>
+        </div>
+
+    </div>
+
+    <script>
+        const OPTIONS = [
+            { label: 'Never', value: 0 },
+            { label: 'Sometimes', value: 1 },
+            { label: 'Most of the time', value: 2 },
+            { label: 'Almost always', value: 3 }
+        ];
+
+        // Build the 4 answer options for each of the 9 questions
+        document.querySelectorAll('.question').forEach(qDiv => {
+            const qIndex = qDiv.dataset.q;
+            const optionsContainer = qDiv.querySelector('.options');
+            OPTIONS.forEach(opt => {
+                const label = document.createElement('label');
+                label.className = 'option';
+                label.innerHTML = `<input type="radio" name="q${qIndex}" value="${opt.value}"> ${opt.label}`;
+                label.addEventListener('click', () => {
+                    optionsContainer.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                    label.classList.add('selected');
+                    updateProgress();
+                });
+                optionsContainer.appendChild(label);
+            });
+        });
+
+        function updateProgress() {
+            const answered = document.querySelectorAll('.question input:checked').length;
+            const pct = (answered / 9) * 100;
+            document.getElementById('progressFill').style.width = pct + '%';
+        }
+
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const stored = localStorage.getItem('userData');
+            if (!stored) {
+                window.location.href = '/login';
+                return;
+            }
+            currentUser = JSON.parse(stored);
+        });
+
+        document.getElementById('pgsiForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorMsg = document.getElementById('errorMsg');
+            const answers = [];
+
+            for (let i = 0; i < 9; i++) {
+                const checked = document.querySelector(`input[name="q${i}"]:checked`);
+                if (!checked) {
+                    errorMsg.style.display = 'block';
+                    document.querySelector(`.question[data-q="${i}"]`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+                answers.push(parseInt(checked.value));
+            }
+            errorMsg.style.display = 'none';
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            try {
+                const res = await fetch('/api/pgsi-assessment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUser.id, answers })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showResults(data.score, data.risk_level);
+                } else {
+                    alert(data.message || 'Something went wrong. Please try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'See My Results';
+                }
+            } catch (err) {
+                alert('Connection error. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'See My Results';
+            }
+        });
+
+        const RISK_INFO = {
+            non_problem: {
+                label: '✅ Non-Problem Gambler',
+                desc: "Your answers don't show signs of gambling-related risk right now. BetAware SA will still help you track spending and stay in control."
+            },
+            low_risk: {
+                label: '🟡 Low Risk',
+                desc: "Your answers show some minor signs worth keeping an eye on. The budgeting and awareness tools in BetAware SA are a great fit for you."
+            },
+            moderate_risk: {
+                label: '🟠 Moderate Risk',
+                desc: "Your answers suggest a moderate level of risk. We recommend using the Urge Pause tool regularly and considering support resources below."
+            },
+            problem_gambler: {
+                label: '🔴 High Risk',
+                desc: "Your answers suggest a significant level of risk. This doesn't define you — but we strongly encourage reaching out to the free, confidential support below. BetAware SA will apply stricter safeguards to your account."
+            }
+        };
+
+        function showResults(score, riskLevel) {
+            document.getElementById('quizScreen').style.display = 'none';
+            document.getElementById('resultsScreen').style.display = 'block';
+
+            document.getElementById('scoreNum').textContent = score;
+            const circle = document.getElementById('scoreCircle');
+            circle.className = 'score-circle risk-' + riskLevel;
+
+            const info = RISK_INFO[riskLevel] || RISK_INFO.non_problem;
+            document.getElementById('riskLabel').textContent = info.label;
+            document.getElementById('riskDesc').textContent = info.desc;
+
+            if (riskLevel === 'moderate_risk' || riskLevel === 'problem_gambler') {
+                document.getElementById('sargfBox').style.display = 'block';
+            }
+        }
+
+        function goToDashboard() {
+            window.location.href = '/dashboard';
+        }
+    </script>
+</body>
+</html>

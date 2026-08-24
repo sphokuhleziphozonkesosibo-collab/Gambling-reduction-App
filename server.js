@@ -74,6 +74,14 @@ function calculateRiskStatus(current_balance, monthly_budget) {
     };
 }
 
+// 🩺 PGSI CLINICAL SCORING
+function calculatePgsiRisk(totalScore) {
+    if (totalScore === 0) return 'non_problem';
+    if (totalScore <= 2) return 'low_risk';
+    if (totalScore <= 7) return 'moderate_risk';
+    return 'problem_gambler'; // 8+
+}
+
 // Universal file routing
 function serveHtml(res, filename) {
     const paths = [
@@ -91,6 +99,7 @@ function serveHtml(res, filename) {
 app.get(['/', '/login', '/login.html'], (req, res) => serveHtml(res, 'login.html'));
 app.get(['/register', '/register.html'], (req, res) => serveHtml(res, 'register.html'));
 app.get(['/dashboard', '/dashboard.html'], (req, res) => serveHtml(res, 'dashboard.html'));
+app.get(['/pgsi-assessment', '/pgsi-assessment.html'], (req, res) => serveHtml(res, 'pgsi-assessment.html'));
 
 // 🔐 AUTH
 app.post("/register", authLimiter, async (req, res) => {
@@ -118,7 +127,8 @@ app.post("/register", authLimiter, async (req, res) => {
         req.session.userId = result.insertId;
         res.json({
             success: true,
-            user: { id: result.insertId, name, email, monthly_budget, current_balance: monthly_budget, preferred_language }
+            user: { id: result.insertId, name, email, monthly_budget, current_balance: monthly_budget, preferred_language },
+            needs_pgsi: true
         });
     } catch (err) {
         res.json({ success: false, message: err.message });
@@ -145,7 +155,8 @@ app.post("/login", authLimiter, async (req, res) => {
                 monthly_budget: parseFloat(user.monthly_budget),
                 current_balance: parseFloat(user.current_balance),
                 preferred_language: user.preferred_language || 'en'
-            }
+            },
+            needs_pgsi: !user.pgsi_completed_at
         });
     } catch (err) {
         res.json({ success: false, message: "Login error" });
@@ -154,11 +165,47 @@ app.post("/login", authLimiter, async (req, res) => {
 
 app.post("/logout", (req, res) => req.session.destroy(() => res.json({ success: true })));
 
+// 🩺 PGSI ASSESSMENT SUBMISSION
+app.post("/api/pgsi-assessment", async (req, res) => {
+    const { user_id, answers } = req.body;
+
+    if (!user_id || !Array.isArray(answers) || answers.length !== 9) {
+        return res.json({ success: false, message: "Invalid submission — all 9 questions are required." });
+    }
+
+    const validAnswers = answers.every(a => Number.isInteger(a) && a >= 0 && a <= 3);
+    if (!validAnswers) {
+        return res.json({ success: false, message: "Invalid answer values." });
+    }
+
+    const totalScore = answers.reduce((sum, a) => sum + a, 0);
+    const riskLevel = calculatePgsiRisk(totalScore);
+
+    try {
+        await pool.query(
+            "UPDATE users SET pgsi_score = ?, pgsi_risk_level = ?, pgsi_completed_at = NOW() WHERE id = ?",
+            [totalScore, riskLevel, user_id]
+        );
+
+        res.json({
+            success: true,
+            score: totalScore,
+            risk_level: riskLevel,
+            sargf: (riskLevel === 'problem_gambler' || riskLevel === 'moderate_risk') ? SARGF_HOTLINE : null
+        });
+    } catch (err) {
+        res.json({ success: false, message: err.message });
+    }
+});
+
 // 📊 DASHBOARD & EXPENSES API
 app.get("/api/user-data/:userId", async (req, res) => {
     try {
         const userId = req.params.userId;
-        const [users] = await pool.query("SELECT id, name, email, monthly_budget, current_balance, preferred_language FROM users WHERE id = ?", [userId]);
+        const [users] = await pool.query(
+            "SELECT id, name, email, monthly_budget, current_balance, preferred_language, pgsi_score, pgsi_risk_level, pgsi_completed_at FROM users WHERE id = ?",
+            [userId]
+        );
         if (users.length === 0) return res.json({ success: false, message: "User not found" });
 
         const [expenses] = await pool.query("SELECT * FROM expenses WHERE user_id = ? ORDER BY date_time DESC LIMIT 15", [userId]);
@@ -301,4 +348,5 @@ app.listen(PORT, () => {
     console.log(`🚀 BetAware SA Enterprise running on http://localhost:${PORT}`);
     console.log(`🚨 Risk alert engine: ACTIVE`);
     console.log(`🛡️  Self-exclusion engine: ACTIVE`);
+    console.log(`🩺 PGSI clinical assessment engine: ACTIVE`);
 });

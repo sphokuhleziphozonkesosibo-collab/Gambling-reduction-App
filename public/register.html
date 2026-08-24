@@ -513,10 +513,15 @@
                     alertDiv.className = 'alert alert-success';
                     alertDiv.style.display = 'block';
                     
-                    // Redirect to login
+                    // Redirect to the PGSI screening (new users), or
+                    // straight to the dashboard if they've already taken it
                     setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 4000);
+                        if (data.needs_pgsi) {
+                            window.location.href = '/pgsi-assessment';
+                        } else {
+                            window.location.href = '/dashboard';
+                        }
+                    }, 2000);
                     
                 } else {
                     alertDiv.textContent = '❌ ' + data.message;
