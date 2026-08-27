@@ -5,187 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-translate="registerTitle">Register - BetAware SA</title>
     <link rel="stylesheet" href="css/global.css">
-    <style>
-        .auth-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #CF0A2C 0%, #9B0B23 100%);
-            padding: 20px;
-        }
-        
-        .auth-form {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 500px;
-        }
-        
-        .auth-form h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #333;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-        }
-        
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        .form-group input:focus, .form-group select:focus {
-            border-color: #CF0A2C;
-            outline: none;
-        }
-        
-        /* Language Section Styles */
-        .language-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            border-left: 4px solid #CF0A2C;
-        }
-        
-        .language-section h3 {
-            margin-bottom: 15px;
-            color: #333;
-            font-size: 18px;
-        }
-        
-        .language-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin-top: 15px;
-            max-height: 200px;
-            overflow-y: auto;
-            padding: 10px;
-        }
-        
-        .language-option {
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-            font-size: 14px;
-        }
-        
-        .language-option:hover {
-            border-color: #CF0A2C;
-            background: #fff5f5;
-        }
-        
-        .language-option.selected {
-            border-color: #CF0A2C;
-            background: #fff5f5;
-            font-weight: bold;
-        }
-        
-        .budget-preview {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            text-align: center;
-            border-left: 4px solid #CF0A2C;
-        }
-        
-        .btn-primary {
-            width: 100%;
-            padding: 12px;
-            background: #CF0A2C;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        
-        .btn-primary:hover {
-            background: #9B0B23;
-        }
-        
-        .auth-links {
-            text-align: center;
-            margin-top: 20px;
-        }
-        
-        .auth-links a {
-            color: #CF0A2C;
-            text-decoration: none;
-        }
-        
-        .alert {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-    </style>
 </head>
 <body>
     <div class="auth-container">
-        <div class="auth-form">
-            <h2 data-translate="createAccount">🎯 Create Your Account</h2>
-            
+        <div class="auth-form" style="max-width: 540px;">
+            <h2 data-translate="createAccount">🎯 Create your account</h2>
+            <p class="subtitle">Set a safe betting budget in under a minute</p>
+
             <div id="alertMessage" class="alert" style="display: none;"></div>
-            
+
             <form id="registerForm">
                 <div class="form-group">
                     <label for="name" data-translate="fullName">Full Name:</label>
                     <input type="text" id="name" name="name" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="email" data-translate="email">Email:</label>
                     <input type="email" id="email" name="email" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="password" data-translate="password">Password (min 6 characters):</label>
                     <input type="password" id="password" name="password" required minlength="6">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="monthly_salary" data-translate="monthlySalary">Monthly Salary (R):</label>
                     <input type="number" id="monthly_salary" name="monthly_salary" min="1000" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="betting_percentage" data-translate="bettingBudget">Betting Budget (% of salary):</label>
                     <select id="betting_percentage" name="betting_percentage">
@@ -196,188 +45,53 @@
                     </select>
                 </div>
 
-                <!-- 🎯 SOUTH AFRICAN LANGUAGES SECTION -->
                 <div class="language-section">
-                    <h3 data-translate="chooseLanguage">🌍 Choose Your Preferred Language</h3>
+                    <h3 data-translate="chooseLanguage">🌍 Choose your preferred language</h3>
                     <p data-translate="languageDescription">Select the language you want to use in the app:</p>
                     <div class="language-grid">
-                        <div class="language-option selected" onclick="selectLanguage('en')">
-                            🇺🇸 <span data-translate="english">English</span>
-                        </div>
-                        <div class="language-option" onclick="selectLanguage('zu')">
-                            🇿🇦 <span data-translate="zulu">isiZulu</span>
-                        </div>
-                        <div class="language-option" onclick="selectLanguage('af')">
-                            🇿🇦 <span data-translate="afrikaans">Afrikaans</span>
-                        </div>
-                        <div class="language-option" onclick="selectLanguage('nso')">
-                            🇿🇦 <span data-translate="sesothoSaLeboa">Sesotho sa Leboa</span>
-                        </div>
-                        <div class="language-option" onclick="selectLanguage('st')">
-                            🇿🇦 <span data-translate="sesotho">Sesotho</span>
-                        </div>
-                        <div class="language-option" onclick="selectLanguage('tn')">
-                            🇿🇦 <span data-translate="setswana">Setswana</span>
-                        </div>
-                        <div class="language-option" onclick="selectLanguage('ts')">
-                            🇿🇦 <span data-translate="xitsonga">Xitsonga</span>
-                        </div>
-                        <div class="language-option" onclick="selectLanguage('ss')">
-                            🇿🇦 <span data-translate="siswati">siSwati</span>
-                        </div>
-                        <div class="language-option" onclick="selectLanguage('ve')">
-                            🇿🇦 <span data-translate="tshivenda">Tshivenda</span>
-                        </div>
-                        <div class="language-option" onclick="selectLanguage('nr')">
-                            🇿🇦 <span data-translate="isindebele">isiNdebele</span>
-                        </div>
-                        <div class="language-option" onclick="selectLanguage('xh')">
-                            🇿🇦 <span data-translate="isixhosa">isiXhosa</span>
-                        </div>
+                        <div class="language-option selected" onclick="selectLanguage('en')">🇺🇸 <span data-translate="english">English</span></div>
+                        <div class="language-option" onclick="selectLanguage('zu')">🇿🇦 <span data-translate="zulu">isiZulu</span></div>
+                        <div class="language-option" onclick="selectLanguage('af')">🇿🇦 <span data-translate="afrikaans">Afrikaans</span></div>
+                        <div class="language-option" onclick="selectLanguage('nso')">🇿🇦 <span data-translate="sesothoSaLeboa">Sesotho sa Leboa</span></div>
+                        <div class="language-option" onclick="selectLanguage('st')">🇿🇦 <span data-translate="sesotho">Sesotho</span></div>
+                        <div class="language-option" onclick="selectLanguage('tn')">🇿🇦 <span data-translate="setswana">Setswana</span></div>
+                        <div class="language-option" onclick="selectLanguage('ts')">🇿🇦 <span data-translate="xitsonga">Xitsonga</span></div>
+                        <div class="language-option" onclick="selectLanguage('ss')">🇿🇦 <span data-translate="siswati">siSwati</span></div>
+                        <div class="language-option" onclick="selectLanguage('ve')">🇿🇦 <span data-translate="tshivenda">Tshivenda</span></div>
+                        <div class="language-option" onclick="selectLanguage('nr')">🇿🇦 <span data-translate="isindebele">isiNdebele</span></div>
+                        <div class="language-option" onclick="selectLanguage('xh')">🇿🇦 <span data-translate="isixhosa">isiXhosa</span></div>
                     </div>
                     <input type="hidden" id="selectedLanguage" name="preferred_language" value="en">
                 </div>
-                
+
                 <div class="budget-preview">
-                    <strong data-translate="monthlyBudget">Your Monthly Betting Budget: </strong>
+                    <strong data-translate="monthlyBudget">Your Monthly Betting Budget</strong>
                     <span id="budgetAmount">R 0</span>
                 </div>
-                
+
                 <button type="submit" class="btn-primary" data-translate="createAccountBtn">Create Account</button>
             </form>
-            
+
             <div class="auth-links">
                 <p data-translate="haveAccount">Already have an account?</p>
-<button type="button" onclick="window.location.href='login.html'">
-    Login
-</button>
+                <button type="button" onclick="window.location.href='login.html'">Login</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // 11 Official SA Languages Translations for Register
         const translations = {
-            en: {
-                registerTitle: "Register - BetAware SA",
-                createAccount: "🎯 Create Your Account",
-                fullName: "Full Name:",
-                email: "Email:",
-                password: "Password (min 6 characters):",
-                monthlySalary: "Monthly Salary (R):",
-                bettingBudget: "Betting Budget (% of salary):",
-                veryConservative: "5% - Very Conservative",
-                recommended: "10% - Recommended",
-                moderate: "15% - Moderate",
-                highRisk: "20% - High Risk",
-                chooseLanguage: "🌍 Choose Your Preferred Language",
-                languageDescription: "Select the language you want to use in the app:",
-                english: "English",
-                zulu: "isiZulu",
-                afrikaans: "Afrikaans",
-                sesothoSaLeboa: "Sesotho sa Leboa",
-                sesotho: "Sesotho",
-                setswana: "Setswana",
-                xitsonga: "Xitsonga",
-                siswati: "siSwati",
-                tshivenda: "Tshivenda",
-                isindebele: "isiNdebele",
-                isixhosa: "isiXhosa",
-                monthlyBudget: "Your Monthly Betting Budget:",
-                createAccountBtn: "Create Account",
-                haveAccount: "Already have an account?",
-                loginHere: "Login here"
-            },
-            zu: {
-                registerTitle: "Bhalisa - BetAware SA",
-                createAccount: "🎯 Yakha I-akhawunti Yakho",
-                fullName: "Igama Eliphelele:",
-                email: "I-imeyili:",
-                password: "Iphasiwedi (okungenani izinhlamvu eziyisithupha):",
-                monthlySalary: "Umholo Wenyanga (R):",
-                bettingBudget: "Isabelo Sokubheja (% yomholo):",
-                veryConservative: "5% - Uncane Kakhulu",
-                recommended: "10% - Kunconywa",
-                moderate: "15% - Maphakathi",
-                highRisk: "20% - Ingcuphefa Enkulu",
-                chooseLanguage: "🌍 Khetha Ulimi Oluthandayo",
-                languageDescription: "Khetha ulimi ofuna ukulusebenzisa kuhlelo:",
-                english: "IsiNgisi",
-                zulu: "isiZulu",
-                afrikaans: "IsiBhunu",
-                sesothoSaLeboa: "Sesotho sa Leboa",
-                sesotho: "Sesotho",
-                setswana: "Setswana",
-                xitsonga: "Xitsonga",
-                siswati: "siSwati",
-                tshivenda: "Tshivenda",
-                isindebele: "isiNdebele",
-                isixhosa: "isiXhosa",
-                monthlyBudget: "Isabelo Sakho Sanyanga Sokubheja:",
-                createAccountBtn: "Yakha I-akhawunti",
-                haveAccount: "Sekakhe unawo i-akhawunti?",
-                loginHere: "Ngena lapha"
-            },
-            af: {
-                registerTitle: "Registreer - BetAware SA",
-                createAccount: "🎯 Skep Jou Rekening",
-                fullName: "Volle Naam:",
-                email: "E-pos:",
-                password: "Wagwoord (min 6 karakters):",
-                monthlySalary: "Maandelikse Salaris (R):",
-                bettingBudget: "Dobbelbegroting (% van salaris):",
-                veryConservative: "5% - Baie Konserwatief",
-                recommended: "10% - Aanbeveel",
-                moderate: "15% - Matig",
-                highRisk: "20% - Hoë Risiko",
-                chooseLanguage: "🌍 Kies Jou Voorkeurtaal",
-                languageDescription: "Kies die taal wat jy in die app wil gebruik:",
-                english: "Engels",
-                zulu: "Zoeloe",
-                afrikaans: "Afrikaans",
-                sesothoSaLeboa: "Sesotho sa Leboa",
-                sesotho: "Sesotho",
-                setswana: "Setswana",
-                xitsonga: "Xitsonga",
-                siswati: "Swazi",
-                tshivenda: "Venda",
-                isindebele: "Ndebele",
-                isixhosa: "Xhosa",
-                monthlyBudget: "Jou Maandelikse Dobbelbegroting:",
-                createAccountBtn: "Skep Rekening",
-                haveAccount: "Het jy reeds 'n rekening?",
-                loginHere: "Meld hier aan"
-            },
-            xh: {
-                registerTitle: "Bhalisa - BetAware SA",
-                createAccount: "🎯 Yenza I-akhawunti Yakho",
-                fullName: "Igama Elipheleleyo:",
-                email: "I-imeyili:",
-                password: "Iphasiwedi (ubuncinane iigram eziyisithandathu):",
-                monthlySalary: "Umvuzo wanyanga (R):",
-                bettingBudget: "Uxwebhu lwemali yokubheja (% yomvuzo):",
-                veryConservative: "5% - Uncinci Kakhulu",
-                recommended: "10% - Iyacebisa",
-                moderate: "15% - Isesazulwini",
-                highRisk: "20% - Ingcinezelo Enkulu",
-                chooseLanguage: "🌍 Khetha Ulwimi Oluthandekayo",
-                languageDescription: "Khetha ulwimi ofuna ukulusebenzisa kwiapp:",
-                english: "IsiNgesi",
-                zulu: "isiZulu",
-                afrikaans: "IsiBhulu",
-                sesothoSaLeboa: "Sesotho sa Leboa",
-                sesotho: "Sesotho",
-                setswana: "Setswana",
-                xitsonga: "Xitsonga",
-                siswati: "siSwati",
-                tshivenda: "Tshivenda",
-                isindebele: "isiNdebele",
-                isixhosa: "isiXhosa",
-                monthlyBudget: "Uxwebhu lwakho lwemali yokubheja lwanyanga:",
-                createAccountBtn: "Yenza I-akhawunti",
-                haveAccount: "Sele unayo i-akhawunti?",
-                loginHere: "Ngena apha"
-            }
-            // Add other 7 languages following the same pattern...
+            en: { registerTitle: "Register - BetAware SA", createAccount: "🎯 Create your account", fullName: "Full Name:", email: "Email:", password: "Password (min 6 characters):", monthlySalary: "Monthly Salary (R):", bettingBudget: "Betting Budget (% of salary):", veryConservative: "5% - Very Conservative", recommended: "10% - Recommended", moderate: "15% - Moderate", highRisk: "20% - High Risk", chooseLanguage: "🌍 Choose your preferred language", languageDescription: "Select the language you want to use in the app:", english: "English", zulu: "isiZulu", afrikaans: "Afrikaans", sesothoSaLeboa: "Sesotho sa Leboa", sesotho: "Sesotho", setswana: "Setswana", xitsonga: "Xitsonga", siswati: "siSwati", tshivenda: "Tshivenda", isindebele: "isiNdebele", isixhosa: "isiXhosa", monthlyBudget: "Your Monthly Betting Budget", createAccountBtn: "Create Account", haveAccount: "Already have an account?", loginHere: "Login here" },
+            zu: { registerTitle: "Bhalisa - BetAware SA", createAccount: "🎯 Yakha I-akhawunti Yakho", fullName: "Igama Eliphelele:", email: "I-imeyili:", password: "Iphasiwedi (okungenani izinhlamvu eziyisithupha):", monthlySalary: "Umholo Wenyanga (R):", bettingBudget: "Isabelo Sokubheja (% yomholo):", veryConservative: "5% - Uncane Kakhulu", recommended: "10% - Kunconywa", moderate: "15% - Maphakathi", highRisk: "20% - Ingcuphefa Enkulu", chooseLanguage: "🌍 Khetha Ulimi Oluthandayo", languageDescription: "Khetha ulimi ofuna ukulusebenzisa kuhlelo:", english: "IsiNgisi", zulu: "isiZulu", afrikaans: "IsiBhunu", sesothoSaLeboa: "Sesotho sa Leboa", sesotho: "Sesotho", setswana: "Setswana", xitsonga: "Xitsonga", siswati: "siSwati", tshivenda: "Tshivenda", isindebele: "isiNdebele", isixhosa: "isiXhosa", monthlyBudget: "Isabelo Sakho Sanyanga Sokubheja", createAccountBtn: "Yakha I-akhawunti", haveAccount: "Sekakhe unawo i-akhawunti?", loginHere: "Ngena lapha" },
+            af: { registerTitle: "Registreer - BetAware SA", createAccount: "🎯 Skep Jou Rekening", fullName: "Volle Naam:", email: "E-pos:", password: "Wagwoord (min 6 karakters):", monthlySalary: "Maandelikse Salaris (R):", bettingBudget: "Dobbelbegroting (% van salaris):", veryConservative: "5% - Baie Konserwatief", recommended: "10% - Aanbeveel", moderate: "15% - Matig", highRisk: "20% - Hoë Risiko", chooseLanguage: "🌍 Kies Jou Voorkeurtaal", languageDescription: "Kies die taal wat jy in die app wil gebruik:", english: "Engels", zulu: "Zoeloe", afrikaans: "Afrikaans", sesothoSaLeboa: "Sesotho sa Leboa", sesotho: "Sesotho", setswana: "Setswana", xitsonga: "Xitsonga", siswati: "Swazi", tshivenda: "Venda", isindebele: "Ndebele", isixhosa: "Xhosa", monthlyBudget: "Jou Maandelikse Dobbelbegroting", createAccountBtn: "Skep Rekening", haveAccount: "Het jy reeds 'n rekening?", loginHere: "Meld hier aan" },
+            xh: { registerTitle: "Bhalisa - BetAware SA", createAccount: "🎯 Yenza I-akhawunti Yakho", fullName: "Igama Elipheleleyo:", email: "I-imeyili:", password: "Iphasiwedi (ubuncinane iigram eziyisithandathu):", monthlySalary: "Umvuzo wanyanga (R):", bettingBudget: "Uxwebhu lwemali yokubheja (% yomvuzo):", veryConservative: "5% - Uncinci Kakhulu", recommended: "10% - Iyacebisa", moderate: "15% - Isesazulwini", highRisk: "20% - Ingcinezelo Enkulu", chooseLanguage: "🌍 Khetha Ulwimi Oluthandekayo", languageDescription: "Khetha ulwimi ofuna ukulusebenzisa kwiapp:", english: "IsiNgesi", zulu: "isiZulu", afrikaans: "IsiBhulu", sesothoSaLeboa: "Sesotho sa Leboa", sesotho: "Sesotho", setswana: "Setswana", xitsonga: "Xitsonga", siswati: "siSwati", tshivenda: "Tshivenda", isindebele: "isiNdebele", isixhosa: "isiXhosa", monthlyBudget: "Uxwebhu lwakho lwemali yokubheja lwanyanga", createAccountBtn: "Yenza I-akhawunti", haveAccount: "Sele unayo i-akhawunti?", loginHere: "Ngena apha" },
+            nso: { registerTitle: "Ngwadiša - BetAware SA", createAccount: "🎯 Hlama Akhaonto ya Gago", fullName: "Leina le Lefe:", email: "Imeile:", password: "Phasewete (bonyenya ditlhaka tše 6):", monthlySalary: "Mogolo wa Kgwedi (R):", bettingBudget: "Tekanyetšo ya Petšhe (% ya mogolo):", veryConservative: "5% - E Fokolago Kudu", recommended: "10% - E Kgothaletšwago", moderate: "15% - Magareng", highRisk: "20% - Kotsi e Kgolo", chooseLanguage: "🌍 Kgetha Leleme le o le Ratago", languageDescription: "Kgetha leleme le o nyakago go le šomiša ka go app:", english: "Seisemane", zulu: "isiZulu", afrikaans: "Seburu", sesothoSaLeboa: "Sesotho sa Leboa", sesotho: "Sesotho", setswana: "Setswana", xitsonga: "Xitsonga", siswati: "siSwati", tshivenda: "Tshivenda", isindebele: "isiNdebele", isixhosa: "isiXhosa", monthlyBudget: "Tekanyetšo ya Gago ya Kgwedi ya Petšhe", createAccountBtn: "Hlama Akhaonto", haveAccount: "O šetše o na le akhaonto?", loginHere: "Tsena mo" },
+            st: { registerTitle: "Ngodisa - BetAware SA", createAccount: "🎯 Theha Akhaonto ya Hao", fullName: "Lebitso le Felletseng:", email: "Imeile:", password: "Phasewete (bonyane ditlhaku tse 6):", monthlySalary: "Moputso wa Khwedi (R):", bettingBudget: "Tekanyetso ya Petšhe (% ya moputso):", veryConservative: "5% - E Fokolang Haholo", recommended: "10% - E Khothaletswang", moderate: "15% - Magareng", highRisk: "20% - Kotsi e Kgolo", chooseLanguage: "🌍 Kgetha Puo eo o e Ratang", languageDescription: "Kgetha puo eo o batlang ho e sebedisa ho app:", english: "Senyesemane", zulu: "isiZulu", afrikaans: "Seburu", sesothoSaLeboa: "Sesotho sa Leboa", sesotho: "Sesotho", setswana: "Setswana", xitsonga: "Xitsonga", siswati: "siSwati", tshivenda: "Tshivenda", isindebele: "isiNdebele", isixhosa: "isiXhosa", monthlyBudget: "Tekanyetso ya Hao ya Khwedi ya Petšhe", createAccountBtn: "Theha Akhaonto", haveAccount: "O se o na le akhaonto?", loginHere: "Kena mona" },
+            tn: { registerTitle: "Ngodisa - BetAware SA", createAccount: "🎯 Tlhama Akhaonto ya Gago", fullName: "Leina le le Feletseng:", email: "Imeile:", password: "Phasewete (bonnyennyane ditlhaka di le 6):", monthlySalary: "Salalane ya Kgwedi (R):", bettingBudget: "Tekanyetso ya Petšhe (% ya salalane):", veryConservative: "5% - E e Fokolang Thata", recommended: "10% - E e Kgothaletswang", moderate: "15% - Magareng", highRisk: "20% - Kotsi e Kgolo", chooseLanguage: "🌍 Tlhopha Puo e o e Ratang", languageDescription: "Tlhopha puo e o batlang go e dirisa mo app:", english: "Sekgowa", zulu: "isiZulu", afrikaans: "Seburu", sesothoSaLeboa: "Sesotho sa Leboa", sesotho: "Sesotho", setswana: "Setswana", xitsonga: "Xitsonga", siswati: "siSwati", tshivenda: "Tshivenda", isindebele: "isiNdebele", isixhosa: "isiXhosa", monthlyBudget: "Tekanyetso ya Gago ya Kgwedi ya Petšhe", createAccountBtn: "Tlhama Akhaonto", haveAccount: "A o setse o na le akhaonto?", loginHere: "Tsena fano" },
+            ts: { registerTitle: "Tsarisa - BetAware SA", createAccount: "🎯 Endla Akhawunti ya Wena", fullName: "Vito ro Helela:", email: "Imeyili:", password: "Phaseward (yingana swimarhi swa 6):", monthlySalary: "Muholo wa Hweti (R):", bettingBudget: "Xibalo xa Petšhe (% ya muholo):", veryConservative: "5% - Yi Nga Tsandzeki Swinene", recommended: "10% - Yi Khutaziwaka", moderate: "15% - Exikarhi", highRisk: "20% - Khombo Lerikulu", chooseLanguage: "🌍 Hlawula Ririmi leri u Ri Rhandzaka", languageDescription: "Hlawula ririmi leri u lavaka ku ri tirhisa eka app:", english: "Xinghezi", zulu: "isiZulu", afrikaans: "Xibhunu", sesothoSaLeboa: "Sesotho sa Leboa", sesotho: "Sesotho", setswana: "Setswana", xitsonga: "Xitsonga", siswati: "siSwati", tshivenda: "Tshivenda", isindebele: "isiNdebele", isixhosa: "isiXhosa", monthlyBudget: "Xibalo xa Wena xa Hweti xa Petšhe", createAccountBtn: "Endla Akhawunti", haveAccount: "Xana u na akhawunti xana?", loginHere: "Ngena laha" },
+            ss: { registerTitle: "Bhalisa - BetAware SA", createAccount: "🎯 Yakha Li-akhawunti Lakho", fullName: "Ligama Leliphelele:", email: "I-imeyili:", password: "Liphasiwedi (bonyana tinhlamvu leti-6):", monthlySalary: "Umholo Wenyanga (R):", bettingBudget: "Sabelo Sekubheja (% yemholo):", veryConservative: "5% - Kuncane Kakhulu", recommended: "10% - Kuyancoma", moderate: "15% - Maphakathi", highRisk: "20% - Ingcuphe Lenkhulu", chooseLanguage: "🌍 Khetsa Lulwimi Loluthandzako", languageDescription: "Khetsa lulwimi lofuna kulusebentisa ku-app:", english: "SiNgisi", zulu: "isiZulu", afrikaans: "SiBhunu", sesothoSaLeboa: "Sesotho sa Leboa", sesotho: "Sesotho", setswana: "Setswana", xitsonga: "Xitsonga", siswati: "siSwati", tshivenda: "Tshivenda", isindebele: "isiNdebele", isixhosa: "isiXhosa", monthlyBudget: "Sabelo Sakho Senyanga Sekubheja", createAccountBtn: "Yakha Li-akhawunti", haveAccount: "Se unayo yini li-akhawunti?", loginHere: "Ngena lapha" },
+            ve: { registerTitle: "Ṅwalisa - BetAware SA", createAccount: "🎯 Sika Akhaunthi Yau", fullName: "Dzina Ḽoṱhe:", email: "Iimeili:", password: "Phasiwede (fhedzi maletere a 6):", monthlySalary: "Muholo wa Ṅwedzi (R):", bettingBudget: "Sengelo tsha u Bheja (% ya muholo):", veryConservative: "5% - I no Konḓa Vhukuma", recommended: "10% - I Themendelwaho", moderate: "15% - Vhukati", highRisk: "20% - Khombo Khulu", chooseLanguage: "🌍 Nanga Luambo Lune wa lu Funa", languageDescription: "Nanga luambo lune wa toda u lu shumisa kha app:", english: "Lunzhi", zulu: "isiZulu", afrikaans: "Lubunu", sesothoSaLeboa: "Sesotho sa Leboa", sesotho: "Sesotho", setswana: "Setswana", xitsonga: "Xitsonga", siswati: "siSwati", tshivenda: "Tshivenda", isindebele: "isiNdebele", isixhosa: "isiXhosa", monthlyBudget: "Sengelo tsha Ṅwedzi tsha u Bheja", createAccountBtn: "Sika Akhaunthi", haveAccount: "Vho no vha na akhaunthi?", loginHere: "Dzhena hafha" },
+            nr: { registerTitle: "Bhalisa - BetAware SA", createAccount: "🎯 Yakha I-akhawunti Yakho", fullName: "Ibizo Eliphelele:", email: "I-imeyili:", password: "Iphasiwedi (okungasenani amagama-6):", monthlySalary: "Umholo Wenyanga (R):", bettingBudget: "Isabelo Sekubheja (% yomholo):", veryConservative: "5% - Encani Khulu", recommended: "10% - Kuncomekile", moderate: "15% - Phakathi", highRisk: "20% - Ubungozi Obukhulu", chooseLanguage: "🌍 Khetha Ilimi Olithandako", languageDescription: "Khetha ilimi ofuna ukulisebenzisa kwi-app:", english: "IsiNgisi", zulu: "isiZulu", afrikaans: "IsiBhunu", sesothoSaLeboa: "Sesotho sa Leboa", sesotho: "Sesotho", setswana: "Setswana", xitsonga: "Xitsonga", siswati: "siSwati", tshivenda: "Tshivenda", isindebele: "isiNdebele", isixhosa: "isiXhosa", monthlyBudget: "Isabelo Sakho Senyanga Sekubheja", createAccountBtn: "Yakha I-akhawunti", haveAccount: "Sewuke wanayo i-akhawunti?", loginHere: "Ngena lapha" }
         };
 
         let currentLanguage = 'en';
@@ -406,167 +120,89 @@
             selectedLang = lang;
             currentLanguage = lang;
             document.getElementById('selectedLanguage').value = lang;
-            
-            // Update UI - remove selected class from all options
-            document.querySelectorAll('.language-option').forEach(option => {
-                option.classList.remove('selected');
-            });
-            
-            // Add selected class to clicked option
-            event.target.classList.add('selected');
-            
-            // Translate the page to selected language
+            document.querySelectorAll('.language-option').forEach(option => option.classList.remove('selected'));
+            event.target.closest('.language-option').classList.add('selected');
             translatePage();
-            
-            console.log('🌍 Language selected:', lang);
         }
 
-        // Budget calculator
         function updateBudget() {
             const salary = parseFloat(document.getElementById('monthly_salary').value) || 0;
             const percentage = parseFloat(document.getElementById('betting_percentage').value);
             const budget = salary * (percentage / 100);
-            
             document.getElementById('budgetAmount').textContent = 'R ' + budget.toLocaleString();
         }
-        
+
         document.getElementById('monthly_salary').addEventListener('input', updateBudget);
         document.getElementById('betting_percentage').addEventListener('change', updateBudget);
-        
-        // Initialize budget
         updateBudget();
-        
-        // Registration form handler
+
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const monthly_salary = parseFloat(document.getElementById('monthly_salary').value);
             const betting_percentage = parseFloat(document.getElementById('betting_percentage').value);
             const preferred_language = selectedLang;
-            
+
             const alertDiv = document.getElementById('alertMessage');
-            
-            // Validation
+
             if (!monthly_salary || monthly_salary < 1000) {
-                let message = '❌ Please enter a valid monthly salary (minimum R1000)';
-                if (currentLanguage === 'zu') message = '❌ Sicela ufake umholo wenyanga ovumelekile (okungenani u-R1000)';
-                else if (currentLanguage === 'af') message = '❌ Voer asseblief \'n geldige maandelikse salaris in (minimum R1000)';
-                else if (currentLanguage === 'xh') message = '❌ Nceda ufake umvuzo wenyanga osebenzayo (ubuncinane u-R1000)';
-                
-                alertDiv.textContent = message;
+                alertDiv.textContent = '❌ Please enter a valid monthly salary (minimum R1000)';
                 alertDiv.className = 'alert alert-error';
                 alertDiv.style.display = 'block';
                 return;
             }
-            
-            // Show loading
+
             const submitBtn = e.target.querySelector('button[type="submit"]');
-            submitBtn.textContent = currentLanguage === 'zu' ? 'Iyakha I-akhawunti...' : 
-                                  currentLanguage === 'af' ? 'Skep Rekening...' :
-                                  currentLanguage === 'xh' ? 'Iyenza I-akhawunti...' : 'Creating Account...';
+            submitBtn.textContent = 'Creating Account...';
             submitBtn.disabled = true;
-            
-            const formData = {
-                name: name,
-                email: email,
-                password: password,
-                monthly_salary: monthly_salary,
-                betting_percentage: betting_percentage,
-                preferred_language: preferred_language
-            };
-            
-            console.log('📝 Registration data:', formData);
-            
+
+            const formData = { name, email, password, monthly_salary, betting_percentage, preferred_language };
+
             fetch('/register', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Store user data
                     localStorage.setItem('userData', JSON.stringify(data.user));
-                    // Store preferred language
                     localStorage.setItem('preferredLang', preferred_language);
-                    
-                    // Show success message
+
                     const budget = data.user.monthly_budget;
-                    const langName = getLanguageName(preferred_language);
-                    
-                    let successMessage = `✅ ${data.message}<br><br>Your monthly betting budget: <strong>R ${budget.toLocaleString()}</strong><br><br>App language: <strong>${langName}</strong><br><br>Remember: This is your MAXIMUM spending limit!`;
-                    
-                    if (currentLanguage === 'zu') {
-                        successMessage = `✅ ${data.message}<br><br>Isabelo sakho sanyanga sokubheja: <strong>R ${budget.toLocaleString()}</strong><br><br>Ulimi lohlelo: <strong>${langName}</strong><br><br>Khumbula: Lesi yisilinganiso sakho esiphezulu sokuchitha!`;
-                    } else if (currentLanguage === 'af') {
-                        successMessage = `✅ ${data.message}<br><br>Jou maandelikse dobbelbegroting: <strong>R ${budget.toLocaleString()}</strong><br><br>App-taal: <strong>${langName}</strong><br><br>Onthou: Dit is jou MAKSIMUM bestedingslimiet!`;
-                    } else if (currentLanguage === 'xh') {
-                        successMessage = `✅ ${data.message}<br><br>Uxwebhu lwakho lwemali yokubheja lwanyanga: <strong>R ${budget.toLocaleString()}</strong><br><br>Ulwimi lwe-app: <strong>${langName}</strong><br><br>Khumbula: Eli lilinganiso lakho eliphezulu lokuchitha!`;
-                    }
-                    
-                    alertDiv.innerHTML = successMessage;
+                    alertDiv.innerHTML = `✅ Account created! Your monthly betting budget: <strong>R ${budget.toLocaleString()}</strong>. Check your email to verify your account.`;
                     alertDiv.className = 'alert alert-success';
                     alertDiv.style.display = 'block';
-                    
-                    // Redirect to the PGSI screening (new users), or
-                    // straight to the dashboard if they've already taken it
+
                     setTimeout(() => {
                         if (data.needs_pgsi) {
                             window.location.href = '/pgsi-assessment';
                         } else {
                             window.location.href = '/dashboard';
                         }
-                    }, 2000);
-                    
+                    }, 1500);
+
                 } else {
                     alertDiv.textContent = '❌ ' + data.message;
                     alertDiv.className = 'alert alert-error';
                     alertDiv.style.display = 'block';
-                    
                     submitBtn.textContent = translations[currentLanguage]?.createAccountBtn || 'Create Account';
                     submitBtn.disabled = false;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                let errorMessage = '❌ Registration failed. Please try again.';
-                if (currentLanguage === 'zu') errorMessage = '❌ Ukubhalisa kwehlulekile. Zama futhi.';
-                else if (currentLanguage === 'af') errorMessage = '❌ Registrasie het misluk. Probeer asseblief weer.';
-                else if (currentLanguage === 'xh') errorMessage = '❌ Ukubhalisa kwehlulekile. Zama kwakhona.';
-                
-                alertDiv.textContent = errorMessage;
+                alertDiv.textContent = '❌ Registration failed. Please try again.';
                 alertDiv.className = 'alert alert-error';
                 alertDiv.style.display = 'block';
-                
                 submitBtn.textContent = translations[currentLanguage]?.createAccountBtn || 'Create Account';
                 submitBtn.disabled = false;
             });
         });
 
-        // Helper function to get language name
-        function getLanguageName(langCode) {
-            const names = {
-                en: 'English',
-                zu: 'isiZulu', 
-                af: 'Afrikaans',
-                nso: 'Sesotho sa Leboa',
-                st: 'Sesotho',
-                tn: 'Setswana',
-                ts: 'Xitsonga',
-                ss: 'siSwati',
-                ve: 'Tshivenda',
-                nr: 'isiNdebele',
-                xh: 'isiXhosa'
-            };
-            return names[langCode] || 'English';
-        }
-
-        // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             translatePage();
         });
